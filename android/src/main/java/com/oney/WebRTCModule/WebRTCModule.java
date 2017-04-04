@@ -7,6 +7,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactContext;
@@ -1088,6 +1089,23 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         }
         Log.d(TAG, "peerConnectionSetLocalDescription() end");
     }
+
+    @ReactMethod
+    public void peerConnectionGetLocalDescription(final int id, final Promise promise) {
+        PeerConnection peerConnection = getPeerConnection(id);
+        try {
+            SessionDescription sdp = peerConnection.getLocalDescription();
+
+            WritableMap params = Arguments.createMap();
+            params.putString("type", sdp.type.canonicalForm());
+            params.putString("sdp", sdp.description);
+
+            promise.resolve(params);
+        } catch (NullPointerException exception) {
+            promise.reject("", "Local description has not been set yet for this RTCPeerConnection");
+        }
+    }
+
     @ReactMethod
     public void peerConnectionSetRemoteDescription(final ReadableMap sdpMap, final int id, final Callback callback) {
         PeerConnection peerConnection = getPeerConnection(id);
