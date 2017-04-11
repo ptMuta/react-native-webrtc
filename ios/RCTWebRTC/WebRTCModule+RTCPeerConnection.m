@@ -169,6 +169,20 @@ RCT_EXPORT_METHOD(peerConnectionSetLocalDescription:(RTCSessionDescription *)sdp
   }];
 }
 
+RCT_EXPORT_METHOD(peerConnectionGetLocalDescription:(nonnull NSNumber *) objectID resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    RTCPeerConnection *peerConnection = self.peerConnections[objectID];
+    if (!peerConnection) {
+        reject(@"", @"", [[NSError alloc] init]);
+        return;
+    }
+    
+    NSString *type = [RTCSessionDescription stringForType:peerConnection.localDescription.type];
+    NSDictionary *params = @{@"sdp": peerConnection.localDescription.sdp, @"type": type};
+    
+    resolve(params);
+}
+
 RCT_EXPORT_METHOD(peerConnectionSetRemoteDescription:(RTCSessionDescription *)sdp objectID:(nonnull NSNumber *)objectID callback:(RCTResponseSenderBlock)callback)
 {
   RTCPeerConnection *peerConnection = self.peerConnections[objectID];
